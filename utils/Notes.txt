@@ -1,4 +1,4 @@
-GIT:
+-GIT:
 git branch                  # ver ramas
 git branch nombre           # crear rama
 git checkout nombre         # cambiar de rama
@@ -7,3 +7,13 @@ git merge rama              # fusionar
 git pull                    # traer cambios remotos
 git push                    # subir cambios
 
+-Actualizar rama hija con contenido de rama padre:
+git checkout feature/rama-hija
+git fetch origin
+git rebase origin/rama-padre
+git push --force-with-lease
+
+-Actualizar rama padre con contenido de rama hija:
+git checkout rama-padre
+git pull
+git merge rama-hija
