@@ -1,0 +1,12 @@
+# maze generation & display
+pygame>=2.5.0
+
+# code quality
+flake8>=7.0.0
+mypy>=1.8.0
+
+# packaging
+build>=1.0.0
+
+# testing (optional but recommended)
+pytest>=8.0.0
