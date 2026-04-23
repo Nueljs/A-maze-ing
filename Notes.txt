@@ -1,0 +1,9 @@
+GIT:
+git branch                  # ver ramas
+git branch nombre           # crear rama
+git checkout nombre         # cambiar de rama
+git checkout -b nombre      # crear + cambiar
+git merge rama              # fusionar
+git pull                    # traer cambios remotos
+git push                    # subir cambios
+
