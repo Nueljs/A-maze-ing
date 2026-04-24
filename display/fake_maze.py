@@ -7,7 +7,7 @@ class FakeMaze:
         self.exit = (4, 3)
 
         # Paredes inventadas: diccionario {(x,y): {"N":bool, "E":bool, "S":bool, "W":bool}}
-        self.walls = {
+        self.walls: dict[tuple[int, int], dict[str, bool]] = {
             (0, 0): {"N": True,  "E": False, "S": True,  "W": True},
             (1, 0): {"N": True,  "E": False, "S": False, "W": False},
             (2, 0): {"N": True,  "E": True,  "S": False, "W": False},
@@ -34,7 +34,7 @@ class FakeMaze:
         }
 
         # Camino inventado
-        self.path = [(0, 0), (1, 0), (2, 0), (2, 1), (2, 2), (3, 2), (4, 2), (4, 3)]
+        self.path = [(0, 0), (1, 0), (2, 0), (1, 1), (1, 2), (2, 1), (2, 2), (2, 3), (3, 3)]
 
-    def has_wall(self, x, y, direction):
+    def has_wall(self, x, y, direction) -> bool:
         return self.walls[(x, y)][direction]
