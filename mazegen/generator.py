@@ -5,6 +5,20 @@ import random
 # Direction constatns
 N, E, S, W = 1, 2, 4, 8
 opposite: dict[int, int] = {N: S, S: N, E: W, W: E}
+PATTERN_42: list[tuple[int, int]] = [
+    # "4"
+    (0, 0), (2, 0),
+    (0, 1), (2, 1),
+    (0, 2), (1, 2), (2, 2),
+    (2, 3),
+    (2, 4),
+    # "2"
+    (4, 0), (5, 0),
+    (5, 1),
+    (4, 2), (5, 2),
+    (4, 3),
+    (4, 4), (5, 4)
+]
 
 
 class MazeGenerator:
@@ -108,9 +122,20 @@ class MazeGenerator:
                 self._grid[r][c] &= ~S
 
     def _place_42_pattern(self) -> None:
-        
+        if self._width < 6 or self._height < 5:
+            print("Error: Maze is not bigger enougth for 42 pattern")
+            return 
 
-    def get_cells(self, c: int, r: int) -> int:
+        origin_c: int = (self._width - 6) // 2
+        origin_r: int = (self._height - 5) // 2
+        new_pattern: list[tuple[int, int]] = [
+            (c + origin_c, r + origin_r) for c, r in PATTERN_42
+        ]
+        for cell in new_pattern:
+            self._grid[cell[1]][cell[0]] = 15
+            self._42_cells.add(cell)
+
+    def get_cell(self, c: int, r: int) -> int:
         """Return de wallt bitmask for cell (c, r).
 
         Args:
@@ -133,8 +158,36 @@ class MazeGenerator:
         """
         return (c, r) in self._42_cells 
 
+    def _validate_config(self) -> bool:
+        if self._config.entry == self._config.exit_pos:
+            print("Error: entry and exit must be different")
+            return False
+
+        c, r = self._config.entry
+        if not (0 <= c < self._width and 0 <= r < self._height):
+            print("Error: Entry point out of bounds")
+            return False
+        if not (c == 0 or r == 0 or c == self._width - 1 or
+                r == self._height - 1):
+            print("Error: entry point must be on a border cell")
+            return False
+
+        c, r = self._config.exit_pos
+        if not (0 <= c < self._width and 0 <= r < self._height):
+            print("Error: exit point out of bounds")
+            return False
+        if not (c == 0 or r == 0 or c == self._width - 1 or
+                r == self._height - 1):
+            print("Error: exit point must be on a border cell")
+            return False
+
+        return True
+
     def generate(self) -> None:
         """Generate the maze using recursive backtracker (DFS)"""
+        if not self._validate_config():
+            return
+
         if self._config.seed is not None:
             random.seed(self._config.seed)
 
