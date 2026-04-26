@@ -47,7 +47,7 @@ class MazeGenerator:
     @property
     def entry(self) -> tuple[int, int]:
         """Entry point coordinates (c, r)."""
-        return self._config.entryac
+        return self._config.entry
 
     @property
     def exit_pos(self) -> tuple[int, int]:
