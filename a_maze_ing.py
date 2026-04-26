@@ -1,5 +1,5 @@
 import sys
-from config_parser import MazeConfig, parse_config
+from mazegen.config_parser import MazeConfig, parse_config
 
 
 def call_parser() -> MazeConfig:
