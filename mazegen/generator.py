@@ -47,12 +47,55 @@ class MazeGenerator:
     @property
     def entry(self) -> tuple[int, int]:
         """Entry point coordinates (c, r)."""
-        return self._config.entry
+        return self._config.entryac
 
     @property
     def exit_pos(self) -> tuple[int, int]:
         """Exit point coordinates (c, r)."""
         return self._config.exit_pos
+
+    def _is_3x3_open(self, sc: int, sr: int) -> bool:
+        """Check if the 3x3 square with top-left corner (sc, sr) is fully open.
+
+        Args:
+            sc: Column index of top-left corner.
+            sr: Row index of top-left corner.
+
+        Returns:
+            True if all interior walls are open.
+        """
+        if sc < 0 or sr < 0 or sc + 2 >= self._width or sr + 2 >= self._height:
+            return False
+        for r in range(sr, sr + 3):
+            for c in range(sc, sc + 2):
+                if self._grid[r][c] & E != 0:
+                    return False
+        for r in range(sr, sr + 2):
+            for c in range(sc, sc + 3):
+                if self._grid[r][c] & S != 0:
+                    return False
+        return True
+
+    def _would_create_3x3(self, c: int, r: int, nc: int, nr: int) -> bool:
+        """Check if opening the wall between (c, r) and (nc, nr)
+        would create a 3x3 open area.
+
+        Args:
+            c: Column of current cell.
+            r: Row of current cell.
+            nc: Column of neighbor cell.
+            nr: Row of neighbor cell.
+
+        Returns:
+            True if the move would create a forbidden 3x3 area.
+        """
+        if nc == c:  # movimiento vertical
+            top_r = min(r, nr) - 1
+            corners = [(c - 2, top_r), (c - 1, top_r), (c, top_r)]
+        else:  # movimiento horizontal
+            left_c = min(c, nc) - 1
+            corners = [(left_c, r - 2), (left_c, r - 1), (left_c, r)]
+        return any(self._is_3x3_open(sc, sr) for sc, sr in corners)
 
     def _get_unvisited_neighbors(
         self, c: int, r: int, visited: set[tuple[int, int]]
@@ -73,7 +116,8 @@ class MazeGenerator:
             (c, r - 1, N), (c + 1, r, E), (c, r + 1, S), (c - 1, r, W)]
         for nc, nr, direction in candidates:
             if ((0 <= nc < self._width) and (0 <= nr < self._height)
-                    and ((nc, nr) not in visited)):
+                    and ((nc, nr) not in visited)
+                    and not self._would_create_3x3(c, r, nc, nr)):
                 neighbors.append((nc, nr, direction))
         return neighbors
 
@@ -132,8 +176,14 @@ class MazeGenerator:
             (c + origin_c, r + origin_r) for c, r in PATTERN_42
         ]
         for cell in new_pattern:
-            self._grid[cell[1]][cell[0]] = 15
+            c, r = cell
+            self._grid[r][c] = 15
             self._42_cells.add(cell)
+            candidates: list[tuple[int, int, int]] = [
+                    (c, r - 1, N), (c + 1, r, E), (c, r + 1, S), (c - 1, r, W)]
+            for nc, nr, direction in candidates:
+                if (nc, nr) not in self._42_cells:
+                    self._grid[nr][nc] |= opposite[direction]
 
     def get_cell(self, c: int, r: int) -> int:
         """Return de wallt bitmask for cell (c, r).
