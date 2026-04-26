@@ -1,0 +1,16 @@
+# A-Maze-ing default configuration
+# WIDTH: maze width in cells
+# HEIGHT: maze height in cells
+# ENTRY: entry point coordinates (x,y)
+# EXIT: exit point coordinates (x,y)
+# OUTPUT_FILE: output file name
+# PERFECT: if True, only one path between entry and exit
+# SEED: random seed for reproducibility (optional)
+
+WIDTH=20
+HEIGHT=15
+ENTRY=0,0
+EXIT=19,14
+OUTPUT_FILE=maze=text.txt
+PERFECT=True
+SEED=123
