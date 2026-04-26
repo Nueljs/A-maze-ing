@@ -1,11 +1,24 @@
-from display.fake_maze import FakeMaze
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mazegen'))
+
+from config_parser import parse_config
+from generator import MazeGenerator
 from display.renderer import render_maze_ascii
 
 
 def run_menu():
-    """Menú interactivo básico (versión paso 3)."""
+    """Menú interactivo básico."""
 
-    maze = FakeMaze()
+    if len(sys.argv) < 2:
+        print("Uso: python test_manu.py <ruta_config>")
+        sys.exit(1)
+
+    config = parse_config(sys.argv[1])
+    maze = MazeGenerator(config)
+    maze.generate()
+
     show_path: bool = False
     color_scheme = 0
 

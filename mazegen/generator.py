@@ -1,4 +1,4 @@
-from .config_parser import MazeConfig
+from config_parser import MazeConfig
 import random
 
 
