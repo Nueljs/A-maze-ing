@@ -156,7 +156,7 @@ class MazeGenerator:
         Returns:
         True if the cell belongs to the 42 pattern.
         """
-        return (c, r) in self._42_cells 
+        return (c, r) in self._42_cells
 
     def _validate_config(self) -> bool:
         if self._config.entry == self._config.exit_pos:
