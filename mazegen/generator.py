@@ -1,5 +1,6 @@
 from config_parser import MazeConfig
 import random
+import sys
 
 
 # Direction constatns
@@ -117,6 +118,7 @@ class MazeGenerator:
         for nc, nr, direction in candidates:
             if ((0 <= nc < self._width) and (0 <= nr < self._height)
                     and ((nc, nr) not in visited)
+                    and (nc, nr) not in self._42_cells
                     and not self._would_create_3x3(c, r, nc, nr)):
                 neighbors.append((nc, nr, direction))
         return neighbors
@@ -128,7 +130,6 @@ class MazeGenerator:
         visited: set[tuple[int, int]] = set()
         stack: list[tuple[int, int]] = []
 
-        # First cell, we use entry as a start point
         start = self._config.entry
         visited.add(start)
         stack.append(start)
@@ -149,6 +150,57 @@ class MazeGenerator:
             else:
                 stack.pop()
 
+    def __get_accesible_neighbors(
+        self, c: int, r: int, visited: set[tuple[int, int]]
+    ) -> list[tuple[int, int]]:
+        """Return accesible unvisited neighbors of cell (c, r)
+
+        Arg:
+            c: Column index.
+            r: Row index
+            visited: SEt of alredy visited cells.
+        Returns:
+            List if (nc, nr) coordinates reachable from (c, r).
+        """
+        neighbors: list[tuple[int, int]] = []
+        candidates: list[tuple[int, int, int]] = [
+            (c, r - 1, N), (c + 1, r, E), (c, r + 1, S), (c - 1, r, W)
+        ]
+        for nc, nr, direction in candidates:
+            if ((0 <= nc < self.width) and (0 <= nr < self._height)
+                    and (nc, nr) not in visited
+                    and self._grid[r][c] & direction == 0):
+                neighbors.append((nc, nr))
+        return neighbors
+
+    def solve(self) -> list[tuple[int, int]]:
+        """Find the path from entry to exit using DFS.
+
+        Returns:
+            List of (c, r) coordinates from entry to exit,
+            or empty list if no path found
+        """
+        visited: set[tuple[int, int]] = set()
+        stack: list[tuple[int, int]] = []
+
+        start = self._config.entry
+        visited.add(start)
+        stack.append(start)
+        while stack:
+            current = stack[-1]
+            if current == self._config.exit_pos:
+                return stack
+            neighbors = self.__get_accesible_neighbors(
+                current[0], current[1], visited)
+            if neighbors:
+                next_cell = neighbors[0]
+                stack.append((next_cell))
+                visited.add((next_cell))
+            else:
+                stack.pop()
+
+        return []
+
     def _open_entry_exit(self) -> None:
         points: list[tuple[int, int]] = [
             self._config.entry,
@@ -168,7 +220,7 @@ class MazeGenerator:
     def _place_42_pattern(self) -> None:
         if self._width < 6 or self._height < 5:
             print("Error: Maze is not bigger enougth for 42 pattern")
-            return 
+            return
 
         origin_c: int = (self._width - 6) // 2
         origin_r: int = (self._height - 5) // 2
@@ -179,11 +231,6 @@ class MazeGenerator:
             c, r = cell
             self._grid[r][c] = 15
             self._42_cells.add(cell)
-            candidates: list[tuple[int, int, int]] = [
-                    (c, r - 1, N), (c + 1, r, E), (c, r + 1, S), (c - 1, r, W)]
-            for nc, nr, direction in candidates:
-                if (nc, nr) not in self._42_cells:
-                    self._grid[nr][nc] |= opposite[direction]
 
     def get_cell(self, c: int, r: int) -> int:
         """Return de wallt bitmask for cell (c, r).
@@ -236,13 +283,13 @@ class MazeGenerator:
     def generate(self) -> None:
         """Generate the maze using recursive backtracker (DFS)"""
         if not self._validate_config():
-            return
+            sys.exit(1)
 
         if self._config.seed is not None:
             random.seed(self._config.seed)
 
         self._grid = [[15] * self._width for _ in range(self._height)]
 
+        self._place_42_pattern()
         self._run_dfs()
         self._open_entry_exit()
-        self._place_42_pattern()
