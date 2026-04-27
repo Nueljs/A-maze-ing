@@ -25,19 +25,18 @@ def run_menu():
 
     config = parse_config(sys.argv[1])
     maze = MazeGenerator(config)
-    
 
     show_path: bool = False
     color_scheme = 0
 
     while True:
         print("\n=== A-Maze-ing ===")
-        print("1. Dibujar laberinto")
-        print("2. Mostrar / Ocultar camino")
-        print("3. Cambiar colores")
-        print("4. Salir del laberinto")
+        print("1. Re-generage a new maze")
+        print("2. Show/Hide path from entry to exit")
+        print("3. Rotate maze colors")
+        print("4. Quit")
 
-        choice = input("Elige una opción: ").strip()
+        choice = input("Choice? (1-4):").strip()
 
         if choice == "1":
             maze.generate()
