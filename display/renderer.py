@@ -11,7 +11,7 @@ def has_wall(maze: MazeGenerator, x: int, y: int, direction: str) -> bool:
     return bool(cell & DIR_MAP[direction])
 
 
-def render_maze_ascii(maze: MazeGenerator, show_path: bool, color_scheme: int):
+def render_maze_ascii(maze: MazeGenerator, show_path: bool, color_scheme: int, way: list[tuple[int, int]]):
     """Dibuja el laberinto en ASCII."""
     RESET = "\033[0m"
 
@@ -55,6 +55,8 @@ def render_maze_ascii(maze: MazeGenerator, show_path: bool, color_scheme: int):
                 middle_row += " . "
             elif maze.is_42_cell(x, y):
                 middle_row += " * "
+            elif show_path and (x, y) in way:
+                middle_row += " . "
             else:
                 middle_row += "   "
 

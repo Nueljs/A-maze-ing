@@ -17,7 +17,7 @@ def run_menu():
 
     config = parse_config(sys.argv[1])
     maze = MazeGenerator(config)
-    maze.generate()
+    
 
     show_path: bool = False
     color_scheme = 0
@@ -32,14 +32,17 @@ def run_menu():
         choice = input("Elige una opción: ").strip()
 
         if choice == "1":
-            render_maze_ascii(maze, show_path, color_scheme)
+            maze.generate()
+            way = maze.solve()
+            render_maze_ascii(maze, show_path, color_scheme, way)
         elif choice == "2":
             show_path = not show_path
-            render_maze_ascii(maze, show_path, color_scheme)
+            way = maze.solve()
+            render_maze_ascii(maze, show_path, color_scheme, way)
         elif choice == "3":
             color_scheme = (color_scheme + 1) % 3
             print(f"Esquema de color cambiado a {color_scheme}")
-            render_maze_ascii(maze, show_path, color_scheme)
+            render_maze_ascii(maze, show_path, color_scheme, way)
         elif choice == "4":
             print("Saliendo del programa...")
             break
