@@ -1,13 +1,14 @@
 class FakeMaze:
-    def __init__(self):
+    def __init__(self) -> None:
         self.width = 5
         self.height = 4
 
         self.entry = (0, 0)
         self.exit = (4, 3)
 
-        # Paredes inventadas: diccionario {(x,y): {"N":bool, "E":bool, "S":bool, "W":bool}}
-        self.walls: dict[tuple[int, int], dict[str, bool]] = {
+        # Paredes inventadas: diccionario de paredes por celda
+        self.walls: dict[tuple[int, int], dict[str, bool]]
+        self.walls = {
             (0, 0): {"N": True,  "E": False, "S": True,  "W": True},
             (1, 0): {"N": True,  "E": False, "S": False, "W": False},
             (2, 0): {"N": True,  "E": True,  "S": False, "W": False},
@@ -34,7 +35,11 @@ class FakeMaze:
         }
 
         # Camino inventado
-        self.path = [(0, 0), (1, 0), (2, 0), (1, 1), (1, 2), (2, 1), (2, 2), (2, 3), (3, 3)]
+        self.path: list[tuple[int, int]] = [
+            (0, 0), (1, 0), (2, 0), (1, 1),
+            (1, 2), (2, 1), (2, 2), (2, 3),
+            (3, 3),
+        ]
 
-    def has_wall(self, x, y, direction) -> bool:
+    def has_wall(self, x: int, y: int, direction: str) -> bool:
         return self.walls[(x, y)][direction]

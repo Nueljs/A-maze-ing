@@ -1,0 +1,5 @@
+[tool.flake8]
+exclude = ".venv"
+
+[tool.mypy]
+exclude = "\\.venv"

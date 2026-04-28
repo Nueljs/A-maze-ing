@@ -1,10 +1,7 @@
 import sys
-import os
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mazegen'))
-
-from config_parser import parse_config, MazeConfig
-from generator import MazeGenerator
+from mazegen.config_parser import MazeConfig, parse_config
+from mazegen.generator import MazeGenerator
 from display.renderer import render_maze_ascii
 
 
@@ -16,7 +13,7 @@ def call_parser() -> MazeConfig:
     return config
 
 
-def run_menu():
+def run_menu() -> None:
     """Menú interactivo básico."""
 
     if len(sys.argv) < 2:
