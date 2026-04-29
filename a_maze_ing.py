@@ -21,8 +21,9 @@ def run_menu() -> None:
         sys.exit(1)
 
     config = call_parser()
-    maze = MazeGenerator(config.width, config.height, config.entry, config. exit_pos,
-                          config.output_file, config.perfect, config.seed)
+    maze = MazeGenerator(config.width, config.height, config.entry,
+                         config.exit_pos, config.output_file, config.perfect,
+                         config.seed)
 
     show_path: bool = False
     color_scheme = 0

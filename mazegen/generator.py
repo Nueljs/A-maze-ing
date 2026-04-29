@@ -28,12 +28,12 @@ class MazeGenerator:
     Args:
         config: Parsed maze configuration
     """
-    def __init__(self, width: int = 3, height: int,
-    entry: tuple[int, int],
-    exit_pos: tuple[int, int],
-    output_file: str,
-    perfect: bool,
-    seed: int | None = None) -> None:
+    def __init__(self, width: int, height: int,
+                 entry: tuple[int, int],
+                 exit_pos: tuple[int, int],
+                 output_file: str,
+                 perfect: bool,
+                 seed: int | None = None) -> None:
         self._grid: list[list[int]] = []
         self._entry: tuple[int, int] = entry
         self._exit_pos: tuple[int, int] = exit_pos
