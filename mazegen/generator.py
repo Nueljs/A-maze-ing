@@ -28,7 +28,7 @@ class MazeGenerator:
     Args:
         config: Parsed maze configuration
     """
-    def __init__(self, width: int = 3, height: int,
+    def __init__(self, width: int, height: int,
     entry: tuple[int, int],
     exit_pos: tuple[int, int],
     output_file: str,
