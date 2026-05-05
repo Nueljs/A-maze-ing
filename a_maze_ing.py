@@ -38,9 +38,13 @@ def run_menu() -> None:
         choice = input("Choice? (1-4):").strip()
 
         if choice == "1":
-            maze.generate()
-            way = maze.solve()
-            render_maze_ascii(maze, show_path, color_scheme, way)
+            try:
+                maze.generate()
+                way = maze.solve()
+                render_maze_ascii(maze, show_path, color_scheme, way)
+            except ValueError as e:
+                print(f"Error: {e}")
+                sys.exit(1)
         elif choice == "2":
             show_path = not show_path
             way = maze.solve()
@@ -59,4 +63,3 @@ def run_menu() -> None:
 if __name__ == "__main__":
     print(call_parser())
     run_menu()
-

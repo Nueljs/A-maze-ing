@@ -1,6 +1,4 @@
-from mazegen.config_parser import MazeConfig
 import random
-import sys
 
 
 # Direction constatns
@@ -159,7 +157,7 @@ class MazeGenerator:
             else:
                 stack.pop()
 
-    def __get_accesible_neighbors(
+    def _get_accesible_neighbors(
         self, c: int, r: int, visited: set[tuple[int, int]]
     ) -> list[tuple[int, int]]:
         """Return accesible unvisited neighbors of cell (c, r)
@@ -199,7 +197,7 @@ class MazeGenerator:
             current = stack[-1]
             if current == self._exit_pos:
                 return stack
-            neighbors = self.__get_accesible_neighbors(
+            neighbors = self._get_accesible_neighbors(
                 current[0], current[1], visited)
             if neighbors:
                 next_cell = neighbors[0]
@@ -209,22 +207,6 @@ class MazeGenerator:
                 stack.pop()
 
         return []
-
-    def _open_entry_exit(self) -> None:
-        points: list[tuple[int, int]] = [
-            self._entry,
-            self._exit_pos
-        ]
-
-        for c, r in points:
-            if c == 0:
-                self._grid[r][c] &= ~W
-            elif c == self._width - 1:
-                self._grid[r][c] &= ~E
-            elif r == 0:
-                self._grid[r][c] &= ~N
-            elif r == self._height - 1:
-                self._grid[r][c] &= ~S
 
     def _place_42_pattern(self) -> None:
         if self._width < 6 or self._height < 5:
@@ -240,6 +222,8 @@ class MazeGenerator:
             c, r = cell
             self._grid[r][c] = 15
             self._42_cells.add(cell)
+    
+    def write_output(self) 
 
     def get_cell(self, c: int, r: int) -> int:
         """Return de wallt bitmask for cell (c, r).
@@ -264,35 +248,26 @@ class MazeGenerator:
         """
         return (c, r) in self._42_cells
 
-    def _validate_config(self) -> bool:
+    def _validate_config(self) -> None:
         if self._entry == self._exit_pos:
-            print("Error: entry and exit must be different")
-            return False
+            raise ValueError("entry and exit must be different")
+
+        if self.entry in self._42_cells:
+            raise ValueError("entry overlaps with 42 pattern")
+
+        if self.exit_pos in self._42_cells:
+            raise ValueError("exit overlaps with 42 pattern")
 
         c, r = self._entry
         if not (0 <= c < self._width and 0 <= r < self._height):
-            print("Error: Entry point out of bounds")
-            return False
-        if not (c == 0 or r == 0 or c == self._width - 1 or
-                r == self._height - 1):
-            print("Error: entry point must be on a border cell")
-            return False
+            raise ValueError("entry point out of bounds")
 
         c, r = self._exit_pos
         if not (0 <= c < self._width and 0 <= r < self._height):
-            print("Error: exit point out of bounds")
-            return False
-        if not (c == 0 or r == 0 or c == self._width - 1 or
-                r == self._height - 1):
-            print("Error: exit point must be on a border cell")
-            return False
-
-        return True
+            raise ValueError("exit point out of bounds")
 
     def generate(self) -> None:
         """Generate the maze using recursive backtracker (DFS)"""
-        if not self._validate_config():
-            sys.exit(1)
 
         if self._seed is not None:
             random.seed(self._seed)
@@ -300,6 +275,5 @@ class MazeGenerator:
         self._grid = [[15] * self._width for _ in range(self._height)]
 
         self._place_42_pattern()
+        self._validate_config()
         self._run_dfs()
-        self._open_entry_exit()
-
