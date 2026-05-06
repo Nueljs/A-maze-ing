@@ -222,8 +222,31 @@ class MazeGenerator:
             c, r = cell
             self._grid[r][c] = 15
             self._42_cells.add(cell)
-    
-    def write_output(self) 
+
+    def write_output(self) -> None:
+        with open(self._output_file, 'w') as f:
+            for r in range(self._height):
+                line = ''
+                for c in range(self._width):
+                    line += f'{self._grid[r][c]:x}'
+                f.write(line + '\n')
+            f.write("\n")
+            f.write(f"{self._entry[0]},{self._entry[1]}\n")
+            f.write(f"{self.exit_pos[0]},{self._exit_pos[1]}\n")
+            pace: list[str] = []
+            path: list[tuple[int, int]] = self.solve()
+            for i in range(len(path) - 1):
+                c1 = path[i]
+                c2 = path[i + 1]
+                if c2[0] > c1[0]:
+                    pace.append("E")
+                elif c2[0] < c1[0]:
+                    pace.append("W")
+                elif c2[1] > c1[1]:
+                    pace.append("S")
+                elif c2[1] < c1[1]:
+                    pace.append("N")
+            f.write(f"{''.join(pace)}\n")
 
     def get_cell(self, c: int, r: int) -> int:
         """Return de wallt bitmask for cell (c, r).
@@ -277,3 +300,4 @@ class MazeGenerator:
         self._place_42_pattern()
         self._validate_config()
         self._run_dfs()
+        self.write_output()
