@@ -31,7 +31,11 @@ def render_maze_ascii(
         "\033[97m",  # blanco brillante
     ]
 
-    HOLO = HOLO_COLORS[color_scheme % len(HOLO_COLORS)]
+    n: int = len(HOLO_COLORS)
+    HOLO = HOLO_COLORS[color_scheme % n]
+    ENTRY_COLOR = HOLO_COLORS[(color_scheme + 1) % n]
+    EXIT_COLOR = HOLO_COLORS[(color_scheme + 2) % n]
+    C42_COLOR = HOLO_COLORS[(color_scheme + 3) % n]
     WALL = HOLO
 
     # 🔥 Camino siempre rojo
@@ -73,15 +77,15 @@ def render_maze_ascii(
 
             # Contenido de la celda
             if (x, y) == maze.entry:
-                middle_row += f" {HOLO}{CELL_ENTRY}{RESET} "
+                middle_row += f" {ENTRY_COLOR}{CELL_ENTRY}{RESET} "
             elif (x, y) == maze.exit_pos:
-                middle_row += f" {HOLO}{CELL_EXIT}{RESET} "
+                middle_row += f" {EXIT_COLOR}{CELL_EXIT}{RESET} "
             elif show_path and (x, y) in path:
-                middle_row += f" {RED}{CELL_PATH}{RESET} "   # 🔥 camino rojo
+                middle_row += f" {RED}{CELL_PATH}{RESET} "
             elif maze.is_42_cell(x, y):
-                middle_row += f" {HOLO}{CELL_42}{RESET} "
+                middle_row += f" {C42_COLOR}{CELL_42}{RESET} "
             elif show_path and (x, y) in way:
-                middle_row += f" {RED}{CELL_PATH}{RESET} "   # 🔥 camino rojo
+                middle_row += f" {RED}{CELL_PATH}{RESET} "
             else:
                 middle_row += f" {CELL_EMPTY} "
 
