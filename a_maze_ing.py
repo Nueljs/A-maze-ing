@@ -79,6 +79,7 @@ def run_menu() -> None:
     show_path: bool = False
     color_scheme: int = 0
     way = []
+    maze_generated: bool = False
 
     while True:
         clear_screen()
@@ -95,6 +96,7 @@ def run_menu() -> None:
 
                 maze.generate()
                 way = maze.solve()
+                maze_generated = True
 
                 render_maze_ascii(maze, show_path, color_scheme, way)
                 pause()
@@ -103,6 +105,11 @@ def run_menu() -> None:
                 sys.exit(1)
 
         elif choice == "2":
+            if not maze_generated:
+                print("\n❌ You must generate the maze first (option 1).")
+                pause()
+                continue
+
             show_path = not show_path
 
             clear_screen()
