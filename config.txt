@@ -9,7 +9,7 @@
 
 WIDTH=20
 HEIGHT=15
-ENTRY=2,4
+entry=2,4
 EXIT= 4,12
 OUTPUT_FILE=maze=text.txt
 PERFECT=False

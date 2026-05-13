@@ -28,19 +28,22 @@ def parse_config(path: str) -> MazeConfig:
                         print("Error: invalid line in config:"
                               f" '{line.strip()}'")
                         sys.exit(1)
-                    raw[data[0]] = data[1].strip()
+                    raw[data[0].strip().lower()] = data[1].strip()
+            if raw['perfect'] not in ('True', 'False'):
+                raise ValueError("'PERFECT' must be 'True' or 'False', got"
+                                 f" '{raw['perfect']}'")
             config: MazeConfig = MazeConfig(
-                width=int(raw['WIDTH']),
-                height=int(raw['HEIGHT']),
+                width=int(raw['width']),
+                height=int(raw['height']),
                 entry=(
-                    int(raw['ENTRY'].split(',')[0]),
-                    int(raw['ENTRY'].split(',')[1])),
+                    int(raw['entry'].split(',')[0]),
+                    int(raw['entry'].split(',')[1])),
                 exit_pos=(
-                    int(raw['EXIT'].split(',')[0]),
-                    int(raw['EXIT'].split(',')[1])),
-                output_file=raw['OUTPUT_FILE'],
-                perfect=raw['PERFECT'] == 'True',
-                seed=int(raw["SEED"]) if "SEED" in raw else None
+                    int(raw['exit'].split(',')[0]),
+                    int(raw['exit'].split(',')[1])),
+                output_file=raw['output_file'],
+                perfect=raw['perfect'] == 'True',
+                seed=int(raw["seed"]) if "seed" in raw else None
             )
     except FileNotFoundError:
         print(f"Error: config file '{path}' not found")
