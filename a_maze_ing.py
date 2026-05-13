@@ -1,26 +1,22 @@
-import sys
 import os
+import sys
 import time
 
+from display.renderer import render_maze_ascii
 from mazegen.config_parser import MazeConfig, parse_config
 from mazegen.generator import MazeGenerator
-from display.renderer import render_maze_ascii
 
 
-# =========================
-# 🎨 UI / ESTÉTICA
-# =========================
-
-def clear_screen():
+def clear_screen() -> None:
     os.system("cls" if os.name == "nt" else "clear")
 
 
-def print_title():
+def print_title() -> None:
     print(r"""
  █████╗ ███╗   ███╗ █████╗ ███████╗███████╗
 ██╔══██╗████╗ ████║██╔══██╗╚══███╔╝██╔════╝
-███████║██╔████╔██║███████║  ███╔╝ █████╗  
-██╔══██║██║╚██╔╝██║██╔══██║ ███╔╝  ██╔══╝  
+███████║██╔████╔██║███████║  ███╔╝ █████╗
+██╔══██║██║╚██╔╝██║██╔══██║ ███╔╝  ██╔══╝
 ██║  ██║██║ ╚═╝ ██║██║  ██║███████╗███████╗
 ╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚══════╝╚══════╝
 
@@ -28,7 +24,7 @@ def print_title():
 """)
 
 
-def print_menu(show_path: bool, color_scheme: int):
+def print_menu(show_path: bool, color_scheme: int) -> None:
     print("\n╔══════════════════════════════╗")
     print("║           🧭 MENU            ║")
     print("╠══════════════════════════════╣")
@@ -39,13 +35,9 @@ def print_menu(show_path: bool, color_scheme: int):
     print("╚══════════════════════════════╝")
 
 
-def pause():
+def pause() -> None:
     input("\n⏎ Press ENTER to continue...")
 
-
-# =========================
-# ⚙️ CONFIG
-# =========================
 
 def call_parser() -> MazeConfig:
     if len(sys.argv) != 2:
@@ -54,36 +46,55 @@ def call_parser() -> MazeConfig:
     return parse_config(sys.argv[1])
 
 
-# =========================
-# 🚀 MAIN MENU
-# =========================
-
-def run_menu() -> None:
-
-    if len(sys.argv) < 2:
-        print("Uso: python test_manu.py <ruta_config>")
-        sys.exit(1)
-
-    config = call_parser()
-
-    maze = MazeGenerator(
+def create_maze(config: MazeConfig) -> MazeGenerator:
+    return MazeGenerator(
         config.width,
         config.height,
         config.entry,
         config.exit_pos,
         config.output_file,
         config.perfect,
-        config.seed
+        config.seed,
     )
 
-    show_path: bool = False
-    color_scheme: int = 0
-    way = []
-    maze_generated: bool = False
+
+def generate_maze(maze: MazeGenerator) -> list[tuple[int, int]]:
+    maze.generate()
+    path = maze.solve()
+    if not path:
+        raise ValueError("no valid path found from entry to exit")
+    return path
+
+
+def safe_render(
+    maze: MazeGenerator,
+    show_path: bool,
+    color_scheme: int,
+    path: list[tuple[int, int]],
+) -> None:
+    try:
+        render_maze_ascii(maze, show_path, color_scheme, path)
+    except (IndexError, KeyError, ValueError, OSError) as error:
+        print(f"Error while rendering maze: {error}")
+
+
+def run_menu() -> None:
+    config = call_parser()
+    maze = create_maze(config)
+
+    show_path = False
+    color_scheme = 0
+
+    try:
+        path = generate_maze(maze)
+    except (ValueError, OSError) as error:
+        print(f"Error: {error}")
+        sys.exit(1)
 
     while True:
         clear_screen()
         print_title()
+        safe_render(maze, show_path, color_scheme, path)
         print_menu(show_path, color_scheme)
 
         choice = input("\n👉 Choose an option (1-4): ").strip()
@@ -94,39 +105,22 @@ def run_menu() -> None:
                 print("🛠 Generating maze...\n")
                 time.sleep(0.5)
 
-                maze.generate()
-                way = maze.solve()
-                maze_generated = True
+                maze = create_maze(config)
+                path = generate_maze(maze)
 
-                render_maze_ascii(maze, show_path, color_scheme, way)
+                clear_screen()
+                print_title()
+                safe_render(maze, show_path, color_scheme, path)
                 pause()
-            except ValueError as e:
-                print(f"Error: {e}")
-                sys.exit(1)
+            except (ValueError, OSError) as error:
+                print(f"Error: {error}")
+                pause()
 
         elif choice == "2":
-            if not maze_generated:
-                print("\n❌ You must generate the maze first (option 1).")
-                pause()
-                continue
-
             show_path = not show_path
 
-            clear_screen()
-            print("🧩 Toggling path...\n")
-
-            way = maze.solve()
-            render_maze_ascii(maze, show_path, color_scheme, way)
-            pause()
-
         elif choice == "3":
-            color_scheme = (color_scheme + 1) % 3
-
-            clear_screen()
-            print(f"🎨 Color scheme changed to {color_scheme}\n")
-
-            render_maze_ascii(maze, show_path, color_scheme, way)
-            pause()
+            color_scheme = (color_scheme + 1) % 5
 
         elif choice == "4":
             clear_screen()
@@ -139,11 +133,9 @@ def run_menu() -> None:
             pause()
 
 
-# =========================
-# 🏁 ENTRY POINT
-# =========================
-
 if __name__ == "__main__":
-    clear_screen()
-    print_title()
-    run_menu()
+    try:
+        run_menu()
+    except KeyboardInterrupt:
+        print("\n\n👋 Exiting A-MAZE-ING...\n")
+        sys.exit(0)
