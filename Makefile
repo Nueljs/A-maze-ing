@@ -31,10 +31,6 @@ lint:
 	$(FLAKE8)
 	$(MYPY)
 
-lint-strict:
-	$(FLAKE8)
-	$(MYPY_STRICT)
-
 build:
 	$(PYTHON) -m build
 
